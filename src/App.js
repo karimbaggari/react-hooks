@@ -1,45 +1,32 @@
-import "./App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+
 function App() {
-  const [resourceType, setResourceType] = useState("");
-  const [items, setItems] = useState([]);
-  const [windowsWith, setWindowsWith] = useState(window.innerWidth);
-
-  const handleSize = () => {
-    setWindowsWith(window.innerWidth);
-  };
+  const [name, setName] = useState("");
+  const renderCount = useRef(0);
+  const inputRef = useRef();
+  const prevName = useRef("");
+  useEffect(() => {
+    renderCount.current = renderCount.current + 1;
+  });
 
   useEffect(() => {
-    window.addEventListener("resize", handleSize);
-
-    return () => {
-      window.removeEventListener("resize", handleSize);
-    };
-  }, []);
-
-  useEffect(() => {
-    fetch(`https://jsonplaceholder.typicode.com/todos/${resourceType}`)
-      .then((response) => response.json())
-      .then((json) => {
-        const dataArray = Object.values(json);
-        console.log(resourceType);
-        setItems(dataArray);
-      });
-    return () => {
-      console.log("return from resource changed");
-    };
-  }, [resourceType]);
-
+    prevName.current = name;
+  }, [name]);
+  function focus() {
+    inputRef.current.focus();
+  }
   return (
     <>
-      <div>{windowsWith}</div>
-      <button onClick={() => setResourceType(1)}>first Article</button>
-      <button onClick={() => setResourceType(2)}>second Article</button>
-      <button onClick={() => setResourceType(3)}>third Article</button>
-      <button onClick={() => setResourceType("")}>reset</button>
-      {items.map((item, key) => (
-        <pre key={key}>{JSON.stringify(item)}</pre>
-      ))}
+      <input
+        ref={inputRef}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <div>
+        My name is {name} and it used to be {prevName.current}
+      </div>
+      <div>I rendered {renderCount.current} times</div>
+      <button onClick={focus}>Focus</button>
     </>
   );
 }
