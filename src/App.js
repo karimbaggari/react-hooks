@@ -1,47 +1,40 @@
 import "./App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 function App() {
-  const [resourceType, setResourceType] = useState("");
-  const [items, setItems] = useState([]);
-  const [windowsWith, setWindowsWith] = useState(window.innerWidth);
+  const [number, setNumber] = useState(0);
+  const [dark, setDark] = useState(false);
+  const doubleNumber = useMemo(() => {
+    return slowFunction(number);
+  }, [number]);
 
-  const handleSize = () => {
-    setWindowsWith(window.innerWidth);
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", handleSize);
-
-    return () => {
-      window.removeEventListener("resize", handleSize);
+  const themeStyles = useMemo(() => {
+    return {
+      backgroundColor: dark ? "black" : "white",
+      color: dark ? "white" : "black",
     };
-  }, []);
-
+  }, [dark]);
   useEffect(() => {
-    fetch(`https://jsonplaceholder.typicode.com/todos/${resourceType}`)
-      .then((response) => response.json())
-      .then((json) => {
-        const dataArray = Object.values(json);
-        console.log(resourceType);
-        setItems(dataArray);
-      });
-    return () => {
-      console.log("return from resource changed");
-    };
-  }, [resourceType]);
-
+    console.log("Theme Changed");
+  }, [themeStyles]);
   return (
     <>
-      <div>{windowsWith}</div>
-      <button onClick={() => setResourceType(1)}>first Article</button>
-      <button onClick={() => setResourceType(2)}>second Article</button>
-      <button onClick={() => setResourceType(3)}>third Article</button>
-      <button onClick={() => setResourceType("")}>reset</button>
-      {items.map((item, key) => (
-        <pre key={key}>{JSON.stringify(item)}</pre>
-      ))}
+      <input
+        type="number"
+        value={number}
+        onChange={(e) => setNumber(parseInt(e.target.value))}
+      />
+      <button onClick={() => setDark((prevDark) => !prevDark)}>
+        Change Theme
+      </button>
+      <div style={themeStyles}>{doubleNumber}</div>
     </>
   );
+}
+
+function slowFunction(num) {
+  console.log("Calling Slow Function");
+  for (let i = 0; i <= 100000000; i++) {}
+  return num * 2;
 }
 
 export default App;
