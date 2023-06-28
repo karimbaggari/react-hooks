@@ -1,34 +1,27 @@
-import { useState, useTransition } from "react";
+import { useState, useEffect, useDebugValue } from "react";
+
+function useAge(initialAge) {
+  const [age, setAge] = useState(initialAge);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAge((prevAge) => prevAge + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useDebugValue(age > 18 ? "Adult" : "Child"); // Custom label for debugging
+
+  return age;
+}
 
 function App() {
-  const [isPending, startTransition] = useTransition();
-  const [input, setInput] = useState("");
-  const [list, setList] = useState([]);
+  const age = useAge(5);
 
-  const LIST_SIZE = 20000;
-
-  function handleChange(e) {
-    setInput(e.target.value);
-    startTransition(() => {
-      const l = [];
-      for (let i = 0; i < LIST_SIZE; i++) {
-        l.push(e.target.value);
-      }
-      setList(l);
-    });
-  }
-
-  return (
-    <>
-      <input type="text" value={input} onChange={handleChange} />
-      {isPending
-        ? "loading"
-        : list.map((item, index) => {
-            return <div key={index}>{item}</div>;
-          })}
-      ;
-    </>
-  );
+  return <div>{age} years old</div>;
 }
 
 export default App;
