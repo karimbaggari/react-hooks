@@ -1,32 +1,32 @@
-import { useState, useTransition } from "react";
-
+import { useState, useRef } from "react";
+import ConfirmationModal from "./ConfirmationModal";
 function App() {
-  const [isPending, startTransition] = useTransition();
-  const [input, setInput] = useState("");
-  const [list, setList] = useState([]);
-
-  const LIST_SIZE = 20000;
-
-  function handleChange(e) {
-    setInput(e.target.value);
-    startTransition(() => {
-      const l = [];
-      for (let i = 0; i < LIST_SIZE; i++) {
-        l.push(e.target.value);
-      }
-      setList(l);
-    });
-  }
+  const [open, setOpen] = useState(false);
+  const modalRef = useRef();
 
   return (
     <>
-      <input type="text" value={input} onChange={handleChange} />
-      {isPending
-        ? "loading"
-        : list.map((item, index) => {
-            return <div key={index}>{item}</div>;
-          })}
-      ;
+      <button
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        Open
+      </button>
+      <button onClick={() => modalRef.current.focusCloseBtn()}>
+        Focus Close{" "}
+      </button>
+      <button onClick={() => modalRef.current.focusConfirmBtn()}>
+        Focus Confirm{" "}
+      </button>
+      <button onClick={() => modalRef.current.focusDenyBtn()}>
+        Focus Deny{" "}
+      </button>
+      <ConfirmationModal
+        ref={modalRef}
+        isOpen={open}
+        onClose={() => setOpen(false)}
+      />
     </>
   );
 }
